@@ -48,3 +48,16 @@ This project is set up with [commitizen](https://github.com/commitizen/cz-cli). 
 stage your changes with `git add`. Then initialize the commit with `git commit` and you will be prompted
 with the commitizen Conventional Changelog commit message options. Complete the prompts given by commitizen,
 review your message in the default git commit message composer, and finally save. (Don't for get to push)
+
+### CI/CD
+
+#### Pull Requests
+
+A Github Action is ran on every pull request creation and push to an open PR that will build, test, and
+archive the test coverage as an artifact of the build.
+
+## Todo
+
+- [ ] Explain VSCode Launch Tasks
+- [ ] Create master branch merge Github Action
+- [ ] Explore linting options
