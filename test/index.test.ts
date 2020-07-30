@@ -1,3 +1,3 @@
 test('It should work', () => {
-  expect(1).toBe(1);
+  expect('hello').toBe('hello');
 });

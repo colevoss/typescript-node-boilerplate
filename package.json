@@ -7,7 +7,7 @@
     "tsc": "tsc",
     "test": "jest",
     "commit": "git-cz",
-    "prebuild": "rimraf dist",
+    "prebuild": "rimraf build",
     "build": "npm run tsc",
     "prettier": "prettier"
   },
