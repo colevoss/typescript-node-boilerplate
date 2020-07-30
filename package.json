@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
-    "commit": "git-cz"
+    "tsc": "tsc",
+    "test": "jest",
+    "commit": "git-cz",
+    "prebuild": "rimraf dist",
+    "build": "npm run tsc"
   },
   "author": "",
   "license": "ISC",
