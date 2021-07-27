@@ -5,14 +5,13 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  auto-label:
-    name: Auto Label
+  labeler:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: banyan/auto-label@1.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/labeler@v3
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          configuration-path: .github/labeler.yaml
 
   create-deployment:
     name: Create Deployment
