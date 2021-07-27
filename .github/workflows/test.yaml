@@ -12,7 +12,8 @@ jobs:
 
     steps:
       - name: Create Pending Deployment
-        run: sleep 5
+        run: |
+          sleep 5
           echo "Pending Deployment Created"
 
   build:
