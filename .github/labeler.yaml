@@ -1,0 +1,2 @@
+feature: 'src/**/*.ts'
+ops: '.github/**/*'

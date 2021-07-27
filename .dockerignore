@@ -1,0 +1,24 @@
+# Docker
+*Dockerfile*
+*docker-compose*
+
+# System
+.DS_Store
+.git
+
+.github
+
+# Node/Build
+node_modules
+build
+coverage
+
+# Env
+.env
+# gcloud-auth.json
+
+# Deployment files
+deployment.yaml
+
+# Development
+README.md
