@@ -33,40 +33,29 @@ jobs:
         with:
           node-version: '16'
 
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       - name: Install
         run: npm ci
 
       - name: Build
         run: npm run build --if-present
 
-  # linting:
-  #   name: Super Lint
-  #   runs-on: ubuntu-latest
-  #   needs: build
-
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v2
-  #       with:
-  #         # Full git history is needed to get a proper list of changed files within `super-linter`
-  #         fetch-depth: 0
-
-  #     ################################
-  #     # Run Linter against code base #
-  #     ################################
-  #     - name: Lint Code Base
-  #       uses: github/super-linter@v4
-  #       env:
-  #         DEFAULT_BRANCH: master
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         VALIDATE_ALL_CODEBASE: false
-  #         VALIDATE_GITHUB_ACTIONS: false
-
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
-    # needs: build
-    needs: create-deployment
+    needs: build
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -91,8 +80,7 @@ jobs:
   integration-test:
     name: Integration Tests
     runs-on: ubuntu-latest
-    # needs: build
-    needs: create-deployment
+    needs: build
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -112,31 +100,10 @@ jobs:
     name: Build Docker Image
     runs-on: ubuntu-latest
     # needs: [integration-test, unit-test, linting]
-    needs: [build, integration-test, unit-test]
+    needs: [integration-test, unit-test]
 
     steps:
       - uses: actions/checkout@v2
-      # - name: Build Image
-      #   run: |
-      #     docker build -t typescript-node-boilerplate:${{ github.sha }} .
-
-      # - name: Run Trivy vulnerability scanner
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: 'typescript-node-boilerplate:${{ github.sha }}'
-      #     format: 'table'
-      #     exit-code: '1'
-      #     ignore-unfixed: true
-      #     vuln-type: 'os,library'
-      #     severity: 'CRITICAL,HIGH'
-      # format: 'template'
-      # template: '@/contrib/sarif.tpl'
-      # output: 'trivy-results.sarif'
-
-      # - name: Upload Trivy scan results to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v1
-      #   with:
-      #     sarif_file: 'trivy-results.sarif'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
