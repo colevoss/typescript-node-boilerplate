@@ -1,0 +1,4 @@
+{
+  "typescript": ["*.ts"],
+  "ops": [".github/*"]
+}
