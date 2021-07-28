@@ -115,7 +115,15 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/typescript-node-boilerplate:${{ github.sha }}
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/typescript-node-boilerplate
+          # tags: |
+          #   ${{ github.sha }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
