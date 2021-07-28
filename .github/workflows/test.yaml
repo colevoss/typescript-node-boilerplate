@@ -99,6 +99,7 @@ jobs:
           # tags: |
           #   ${{ github.sha }}
           tags: |
+            ${{ github.sha }}
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
