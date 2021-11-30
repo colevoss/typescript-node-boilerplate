@@ -127,3 +127,16 @@ jobs:
           # push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@main
+        with:
+          service: typescript-node-boilerplate
+          image: |
+            us-central1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT_ID }}/my-test-repo/typescript-node-boilerplate@${{ steps.docker_build.outputs.digest }}
+          credentials: ${{ secrets.GOOGLE_ARTIFACT_REPO_TOKEN }}
+          region: us-central1
+          flags: |
+            --allow-unauthenticated \
+            --labels service=typescript-node-boilerplate
