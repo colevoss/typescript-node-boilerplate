@@ -128,14 +128,30 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@main
+      - name: Set up Google Cloud Tools
+        uses: google-github-actions/setup-gcloud@master
         with:
-          service: typescript-node-boilerplate
-          image: |
-            us-central1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT_ID }}/my-test-repo/typescript-node-boilerplate@${{ steps.docker_build.outputs.digest }}
-          credentials: ${{ secrets.GOOGLE_ARTIFACT_REPO_TOKEN }}
-          region: us-central1
-          flags: |
-            --allow-unauthenticated --labels='service=typescript-node-boilerplate'
+          project_id: ${{ secrets.GOOGLE_PROJECT_ID }}
+          service_account_key: ${{ secrets.GOOGLE_ARTIFACT_REPO_TOKEN }}
+          export_default_credentials: true
+
+      - name: Deploy To Cloud Run
+        run: |
+          gcloud run deploy typescript-node-boilerplate \
+            --region us-central1 \
+            --image us-central1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT_ID }}/my-test-repo/typescript-node-boilerplate@${{ steps.docker_build.outputs.digest }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --labels service=typescript-node-boilerplate
+
+      # - name: Deploy to Cloud Run
+      #   id: deploy
+      #   uses: google-github-actions/deploy-cloudrun@main
+      #   with:
+      #     service: typescript-node-boilerplate
+      #     image: |
+      #       us-central1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT_ID }}/my-test-repo/typescript-node-boilerplate@${{ steps.docker_build.outputs.digest }}
+      #     credentials: ${{ secrets.GOOGLE_ARTIFACT_REPO_TOKEN }}
+      #     region: us-central1
+      #     flags: |
+      #       --allow-unauthenticated --labels='service=typescript-node-boilerplate'
