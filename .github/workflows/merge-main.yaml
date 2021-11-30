@@ -138,5 +138,4 @@ jobs:
           credentials: ${{ secrets.GOOGLE_ARTIFACT_REPO_TOKEN }}
           region: us-central1
           flags: |
-            --allow-unauthenticated \
-            --labels=service=typescript-node-boilerplate
+            --allow-unauthenticated --labels=service=typescript-node-boilerplate
