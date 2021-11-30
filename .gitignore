@@ -1,3 +1,22 @@
+# System
+.DS_Store
+
+# Node/Build
 node_modules
 build
 coverage
+
+# Env
+.env
+*gcloud-auth.json
+
+# Deployment files
+app-*-deployment.yaml
+
+# Private Keys
+*.p8
+
+# This directory can be used for files you don't want synced with source control
+.dev/*
+
+.eslintcache
