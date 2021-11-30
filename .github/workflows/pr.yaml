@@ -16,7 +16,6 @@ jobs:
   build:
     name: Build Project
     runs-on: ubuntu-latest
-    needs: create-deployment
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -32,7 +31,6 @@ jobs:
   linting:
     name: Super Lint
     runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Checkout Code
@@ -48,14 +46,19 @@ jobs:
         uses: github/super-linter@v4
         env:
           DEFAULT_BRANCH: master
+          LINTER_RULES_PATH: ./
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_GITHUB_ACTIONS: false
+          JAVASCRIPT_DEFAULT_STYLE: prettier
+          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          TYPESCRIPT_DEFAULT_STYLE: prettier
+          TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
 
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
-    needs: build
+    # needs: [build, linting]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -80,7 +83,7 @@ jobs:
   integration-test:
     name: Integration Tests
     runs-on: ubuntu-latest
-    needs: build
+    # needs: [build, linting]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -99,24 +102,35 @@ jobs:
   build-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    # needs: [integration-test, unit-test, linting]
-    needs: [integration-test, unit-test]
+    needs: [integration-test, unit-test, linting, build]
+    # needs: [integration-test, unit-test]
 
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   - name: Build Image
+    #     run: |
+    #       docker build -t typescript-node-boilerplate:${{ github.sha }} .
     steps:
-      - uses: actions/checkout@v2
-      - name: Build Image
-        run: |
-          docker build -t typescript-node-boilerplate:${{ github.sha }} .
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            typescript-node-boilerplate
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
 
-  # update-deployment:
-  #   name: Update Deployment
-  #   runs-on: ubuntu-latest
-  #   # needs: [integration-test, unit-test, linting]
-  #   # needs: [integration-test, unit-test]
-  #   needs: build-image
-  #   if: ${{ always() }}
-  #   steps:
-  #     - name: Update Deployment Status
-  #       run: |
-  #         sleep 5
-  #         echo "Deployment Updated"
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          # context: .
+          # push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
