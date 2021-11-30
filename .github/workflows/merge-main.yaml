@@ -139,4 +139,4 @@ jobs:
           region: us-central1
           flags: |
             --allow-unauthenticated \
-            --labels service=typescript-node-boilerplate
+            --labels=service=typescript-node-boilerplate
