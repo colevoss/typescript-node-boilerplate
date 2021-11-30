@@ -105,8 +105,15 @@ jobs:
     # needs: [integration-test, unit-test, linting]
     needs: [integration-test, unit-test]
 
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   - name: Build Image
+    #     run: |
+    #       docker build -t typescript-node-boilerplate:${{ github.sha }} .
     steps:
-      - uses: actions/checkout@v2
-      - name: Build Image
-        run: |
-          docker build -t typescript-node-boilerplate:${{ github.sha }} .
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          tags: typescript-node-boilerplate:${{ github.sha }}
