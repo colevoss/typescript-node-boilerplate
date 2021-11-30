@@ -9,7 +9,7 @@
     "prebuild": "rimraf build",
     "build": "npm run tsc",
     "prettier": "prettier",
-    "prepare": "husky install"
+    "prepare": "node ./scripts/prepare.js"
   },
   "engines": {
     "node": ">=16.0.0"

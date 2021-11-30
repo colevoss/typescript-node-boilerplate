@@ -3,3 +3,5 @@ build
 coverage
 jest.config.js
 *rc.js
+
+scripts/*

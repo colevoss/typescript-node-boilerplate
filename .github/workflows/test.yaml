@@ -13,16 +13,6 @@ jobs:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
           configuration-path: .github/labeler.yaml
 
-  # create-deployment:
-  #   name: Create Deployment
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Create Pending Deployment
-  #       run: |
-  #         sleep 5
-  #         echo "Pending Deployment Created"
-
   build:
     name: Build Project
     runs-on: ubuntu-latest
