@@ -14,6 +14,11 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
+
+# For husky
+# @see https://typicode.github.io/husky/#/?id=disable-husky-in-cidocker
+RUN npm set-script prepare ""
+
 RUN npm ci --production=false
 
 # Build Typescript App
@@ -29,6 +34,11 @@ WORKDIR /app
 
 # Intstall prod dependencies
 COPY --from=build /app/package*.json ./
+
+# For husky
+# @see https://typicode.github.io/husky/#/?id=disable-husky-in-cidocker
+RUN npm set-script prepare ""
+
 RUN npm ci --production
 
 COPY --from=build /app/build ./build
