@@ -1,0 +1,137 @@
+name: Merge Main
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v3
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          configuration-path: .github/labeler.yaml
+
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build --if-present
+
+  linting:
+    name: Super Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          # Full git history is needed to get a proper list of changed files within `super-linter`
+          fetch-depth: 0
+
+      ################################
+      # Run Linter against code base #
+      ################################
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: master
+          LINTER_RULES_PATH: ./
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_GITHUB_ACTIONS: false
+          JAVASCRIPT_DEFAULT_STYLE: prettier
+          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          TYPESCRIPT_DEFAULT_STYLE: prettier
+          TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
+
+  unit-test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    # needs: [build, linting]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+
+      - name: Install
+        run: npm ci
+
+      # - name: Build
+      #   run: npm run build --if-present
+
+      - name: Test
+        run: npm test
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: coverage
+
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    # needs: [build, linting]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+
+      - name: Install
+        run: npm ci
+
+      # - name: Build
+      #   run: npm run build --if-present
+
+      - name: Test
+        run: npm test
+
+  build-image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [integration-test, unit-test, linting, build]
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            us-central1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT_ID }}/my-test-repo/typescript-node-boilerplate
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+
+      - name: Login to GAR
+        uses: docker/login-action@v1
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GOOGLE_ARTIFACT_REPO_TOKEN }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          # context: .
+          # push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
