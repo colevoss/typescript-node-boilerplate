@@ -3,7 +3,7 @@ import { createServer, IncomingMessage, ServerResponse } from 'http';
 const requestListener = (req: IncomingMessage, res: ServerResponse) => {
   res.writeHead(200);
   console.log('Request!');
-  res.end('Hello, World! TERRAFORM CHANGE!!!');
+  res.end('Hello, World!');
 };
 
 const server = createServer(requestListener);
