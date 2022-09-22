@@ -9,5 +9,5 @@ const requestListener = (req: IncomingMessage, res: ServerResponse) => {
 const server = createServer(requestListener);
 
 server.listen(8080, () => {
-  console.log('listening on port 8080!');
+  console.log('listening on port 8080');
 });
