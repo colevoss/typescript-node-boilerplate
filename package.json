@@ -34,7 +34,7 @@
     "rimraf": "^4.4.0",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.4.0",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.2"
   },
   "lint-staged": {
     "*.{ts,js}": "eslint --cache --fix",
